@@ -6,7 +6,7 @@
   "parser_version": "1.0.0",
   "document_ir_schema_version": "1.0",
   "parser_config_hash": "52b37a07da4cb420cb607183fb2e1f088634eb003b69435748b0670eb366bfe1",
-  "code_revision": null,
+  "code_revision": "e4a417c280aa0bfb437f8c15c60a36c3b777798d",
   "total_documents": 4204,
   "doc_group_counts": {
     "periodic": 1054,
@@ -37,5 +37,6 @@
     "dependency 버전이 pyproject.toml에 범위(>=)로만 고정됨 — requirements-lock.txt로 현재 환경 스냅샷만 제공(패키지 관리자 lock file 아님), 완전한 byte reproducibility는 이 lock file을 그대로 쓸 때만 보장",
     "byte reproducibility(동일 JSONL 바이트 스트림)는 아직 두 개의 서로 다른 환경에서 실제로 재실행해 검증한 적 없음(단일 실행만 존재) — semantic reproducibility(canonical hash 일치)만 설계/구현됨",
     "code_revision은 최초 git commit 이후에 채워야 함(이 manifest 생성 시점엔 git 저장소가 없었음)"
-  ]
+  ],
+  "schema_stability_note": "schema_version=1.0 / parser_version=1.0.0은 이번 단계 확정 입력 계약으로 써도 됨 — 현재 변경 예정 없음. 향후 필드 추가/의미 변경이 생기면 버전을 올리고 변경 내용·시점을 이 필드와 docs/document_ir_contract.md §parser_version 관리 방식에 반영해 공지한다."
 }

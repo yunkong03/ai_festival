@@ -90,6 +90,11 @@ def main():
             "byte_reproducibility": "미검증(단일 실행만 존재, 두 환경 교차검증 안 함)",
         },
         "known_gaps": KNOWN_GAPS,
+        "schema_stability_note": (
+            "schema_version=1.0 / parser_version=1.0.0은 이번 단계 확정 입력 계약으로 써도 됨 — "
+            "현재 변경 예정 없음. 향후 필드 추가/의미 변경이 생기면 버전을 올리고 변경 내용·시점을 "
+            "이 필드와 docs/document_ir_contract.md §parser_version 관리 방식에 반영해 공지한다."
+        ),
     }
 
     out_path = out_dir / "handoff" / "a_handoff_manifest.json"
