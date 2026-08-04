@@ -1,0 +1,22 @@
+{
+  "corpus_snapshot_id": "snap_7484a10220422056",
+  "parser_version": "1.0.0",
+  "parser_config_hash": "52b37a07da4cb420cb607183fb2e1f088634eb003b69435748b0670eb366bfe1",
+  "document_ir_schema_version": "1.0",
+  "total_documents": 4204,
+  "group_counts": {
+    "periodic": 1054,
+    "major": 598,
+    "exchange": 1469,
+    "holding": 1083
+  },
+  "group_hashes": {
+    "periodic": "2099f9a8268c00a92678d9c1eb34ebdb35d3f91c4edc03fc547e2f2260c248ea",
+    "major": "a7eadd9e5806def707a2b0190aa60fbb5f0626a5951dc1834b65eb86c7a6ce28",
+    "exchange": "87301f4417fc2f2bffcb216b0a168405a22f37a8a79e17acdf7be8c95930c420",
+    "holding": "d362094465ebd4dceefcef65bdc749a5149971c5b3badfa80c7b7484b15d039f"
+  },
+  "corpus_document_ir_hash": "2b739073cf843720ae92fffa6ad4e76c26993281c28b3de8546f82bf1d21e6db",
+  "hash_algorithm": "sha256",
+  "canonicalization_version": "v1"
+}

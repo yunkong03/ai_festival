@@ -1,0 +1,20 @@
+[project]
+name = "dart-corpus"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "beautifulsoup4>=4.12",   # Parser Pilot Phase — exchange(KIND xforms) malformed HTML 파싱용
+    "tiktoken>=0.7",          # Fixed Token Chunker Phase — 모든 chunking 전략이 공유하는 token counting 규칙
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "jsonschema>=4.20"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: exercises the real corpus on disk, slower than unit tests",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

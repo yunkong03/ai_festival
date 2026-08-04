@@ -1,0 +1,51 @@
+# 원본 corpus — B/C 각자 로컬에 이미 보유 전제, 재배포 안 함
+data/3.공시/
+
+# 전체 DocumentIR(실측 8.61GB) — GitHub에 안 올림. 로컬 재생성:
+#   PYTHONIOENCODING=utf-8 python3 scripts/run_full_corpus.py --out-dir data/artifacts
+# 또는 별도 공유 저장소(Git LFS 아님) 사용.
+data/artifacts/document_ir/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# 가상환경
+.venv/
+venv/
+env/
+
+# 로그 / 임시 파일 / 로컬 실행 산출물
+logs/
+tmp/
+*.log
+*.tmp
+
+# 로컬 IDE 설정(개인 절대경로 포함 가능성 있음)
+.vscode/
+.idea/
+*.swp
+
+# 다른 워크스트림 작업물(Chunking/Embedding/Retrieval/Eval, 바이너리 다수 섞임) —
+# 이번 A handoff 커밋 범위 아님. Tantivy index(.fast/.fieldnorm/.idx/.pos/.store/.term/
+# .tantivy-*.lock)와 모델·임베딩 캐시가 전부 이 디렉터리 하위에만 있어 이 한 줄로 충분.
+experiments/
+
+# 임베딩 벡터 등 대용량 바이너리(어디 있든 항상 제외)
+*.npy
+
+# 과제 소개 PDF(이번 A handoff 커밋 범위 아님)
+미래에셋증권 AI Festival 공식 과제 소개.pdf
+
+# --- 아래 소형 handoff artifact는 위 data/artifacts/document_ir/ 규칙과 무관하게
+# --- 항상 포함한다(명시적 안전장치 — negate pattern) ---
+!data/artifacts/corpus_snapshot.json
+!data/artifacts/parse_summary.json
+!data/artifacts/parse_audit.jsonl
+!data/artifacts/failed_documents.jsonl
+!data/artifacts/parser_gold_candidates.jsonl
+!data/artifacts/parser_gold_annotation_template.csv
+!data/artifacts/handoff/
+!data/artifacts/handoff/**

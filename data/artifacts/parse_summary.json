@@ -1,0 +1,71 @@
+{
+  "corpus_snapshot_id": "snap_7484a10220422056",
+  "total_documents": 4204,
+  "n_success": 4204,
+  "n_failed": 0,
+  "elapsed_s": 1604.3069219999015,
+  "docs_per_s": 2.620446214094349,
+  "tier_distribution": {
+    "partial": 1432,
+    "structured": 2693,
+    "fallback": 79
+  },
+  "tier_distribution_by_doc_group": {
+    "periodic": {
+      "partial": 975,
+      "fallback": 79
+    },
+    "major": {
+      "structured": 409,
+      "partial": 189
+    },
+    "exchange": {
+      "structured": 1469
+    },
+    "holding": {
+      "partial": 268,
+      "structured": 815
+    }
+  },
+  "warning_code_distribution": {
+    "sanitized_entity": 1508,
+    "table_merged_cell_ignored": 4145,
+    "table_metadata_uncertain": 4145,
+    "table_shape_mismatch": 4140,
+    "unknown_section_depth": 2648,
+    "encoding_declaration_mismatch": 1469,
+    "parse_failed": 81
+  },
+  "warning_code_distribution_by_doc_group": {
+    "periodic": {
+      "sanitized_entity": 1051,
+      "table_merged_cell_ignored": 995,
+      "table_metadata_uncertain": 995,
+      "table_shape_mismatch": 995,
+      "unknown_section_depth": 967,
+      "parse_failed": 81
+    },
+    "major": {
+      "table_merged_cell_ignored": 598,
+      "table_metadata_uncertain": 598,
+      "table_shape_mismatch": 593,
+      "unknown_section_depth": 598,
+      "sanitized_entity": 189
+    },
+    "exchange": {
+      "encoding_declaration_mismatch": 1469,
+      "table_merged_cell_ignored": 1469,
+      "table_metadata_uncertain": 1469,
+      "table_shape_mismatch": 1469
+    },
+    "holding": {
+      "sanitized_entity": 268,
+      "table_merged_cell_ignored": 1083,
+      "table_metadata_uncertain": 1083,
+      "table_shape_mismatch": 1083,
+      "unknown_section_depth": 1083
+    }
+  },
+  "avg_text_preservation_ratio": 0.7759738607905108,
+  "failed_doc_ids": []
+}
