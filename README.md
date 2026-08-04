@@ -117,12 +117,14 @@ with open('data/artifacts/handoff/representative_documents.jsonl', encoding='utf
 | 원인 | 문서 수 | `text_preservation_ratio` 평균 | 실질 텍스트 손실? |
 |---|---|---|---|
 | sanitizer 사용(bare `&`/`<` 이스케이프)만으로 partial | 972 | **1.02** | **없음** — 파싱 성공, tier만 규칙상 강등 |
-| pdf+html 강제 partial(PDF 자체는 안 읽음) | 3 | 0.30 | 있음 |
+| pdf+html 강제 partial(PDF 자체는 안 읽음) | 3 | 0.30 | 있음(3건 중 2건은 `<table>` 0개라 완전 손실(ratio 0.0), 1건만 실질 파싱) |
 | fallback(XML well-formed 실패, 태그 벗겨낸 raw text만 보존, 20000자 절단) | 79 | 0.14 | 있음(큼) |
 
 즉 **partial 975건 중 972건은 사실상 structured와 다름없다**(정보 손실 없음, tier
 판정 규칙이 sanitizer 사용 여부에만 민감하기 때문). 실제로 걱정해야 할 대상은
-**fallback 79건 + pdf+html 3건 = 82건**뿐이다. 상세: `docs/document_ir_contract.md`
+**fallback 79건 + pdf+html 3건 = 82건**뿐이다. fallback 79건과 pdf+html 중 완전
+손실 2건(둘 다 `parse_failed` 경고 있음)은 **서로 다른 별개 문서 집합**이다 — 혼동
+방지용 상세 목록은 `data/artifacts/handoff/parse_failure_cases.jsonl`. 상세: `docs/document_ir_contract.md`
 § periodic parse quality.
 
 ## 문서 색인

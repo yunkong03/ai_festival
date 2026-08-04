@@ -67,5 +67,6 @@
     }
   },
   "avg_text_preservation_ratio": 0.7759738607905108,
-  "failed_doc_ids": []
+  "failed_doc_ids": [],
+  "parse_failed_breakdown_note": "[2026-08-04 정정] periodic parse_failed=81은 79(fallback tier, 문서당 1개, XML ET.fromstring 실패, doc_group=periodic)와 2(tier는 partial 유지, pdf+html 문서의 viewer.html에 <table> 0개라 n_nodes=0/ratio=0.0)의 합. 이전에 docs/document_ir_contract.md에 있던 '79건 중 2건이 중복 계상' 서술은 틀린 설명이었음(원본 재대조로 정정). 상세 doc_id 목록: data/artifacts/handoff/parse_failure_cases.jsonl"
 }

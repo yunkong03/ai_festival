@@ -281,12 +281,12 @@ Windows 환경에서 콘솔이 cp949(비 UTF-8)면 `PYTHONIOENCODING=utf-8` 없�
   | 원인 | 문서 수(periodic 1054건 중) | `text_preservation_ratio` 평균 | 실질 텍스트 손실 여부 |
   |---|---|---|---|
   | sanitizer 사용(bare `&`/`<`)만으로 tier가 partial로 강등 | 972 | **1.021** | **없음** — XML 파싱 자체는 완전히 성공, tier 판정 규칙(§5)이 `sanitized_entity` 유무에만 반응해서 강등될 뿐 |
-  | pdf+html 형식이라 강제로 partial(원본 PDF는 안 읽음, viewer.html만) | 3 | 0.301 | 있음 — PDF 콘텐츠 자체가 산출물에 없음 |
+  | pdf+html 형식이라 강제로 partial(원본 PDF는 안 읽음, viewer.html만) | 3 | 0.301 | 있음 — PDF 콘텐츠 자체가 산출물에 없음. 3건 중 2건은 viewer.html에 `<table>` 자체가 없어 `n_nodes=0`(ratio 0.0, 완전 손실 — §parse_failed 정정 및 `parse_failure_cases.jsonl` 참고), 1건만 표가 있어 실질 파싱됨(ratio ≈0.90) |
   | fallback(XML이 sanitize 후에도 well-formed 아님 → `_build_fallback_node`로 태그만 벗겨낸 raw text 1개 문단, 20000자 절단) | 79 | 0.139 | 있음(큼) — 구조 전부 소실 + 긴 문서는 20000자 이후 내용도 소실 |
 
   결론: **partial 975건 중 972건(99.7%)은 사실상 structured와 동등하다**(정보 손실 없이 tier만 규칙상 낮음). 실제로 검토가 필요한 대상은 fallback 79건 + pdf+html 3건, 총 **82건**뿐이다. "fallback parser 사용 문서"와 "parse failure 문서"는 현재 구현에서 **완전히 같은 집합**(79건)이다 — `router_fallback_parser`(라우터가 잘못된 파서를 골라서 나는 fallback)라는 별도 경로는 정의만 있고 실제로 발생한 적이 없다(§5).
 - `avg_text_preservation_ratio = 0.776`
-- warning code 분포: `sanitized_entity` 1508, `table_merged_cell_ignored` 4145, `table_metadata_uncertain` 4145, `table_shape_mismatch` 4140, `unknown_section_depth` 2648, `encoding_declaration_mismatch` 1469(=exchange 전체와 정확히 일치, exchange 100%가 이 경고를 가짐), `parse_failed` 81(fallback 문서 79건 중 2건은 첨부 XML이 2개 이상 실패해 경고가 중복 계상됨 — 문서 수 기준은 항상 79)
+- warning code 분포: `sanitized_entity` 1508, `table_merged_cell_ignored` 4145, `table_metadata_uncertain` 4145, `table_shape_mismatch` 4140, `unknown_section_depth` 2648, `encoding_declaration_mismatch` 1469(=exchange 전체와 정확히 일치, exchange 100%가 이 경고를 가짐), `parse_failed` 81 **[2026-08-04 정정]** — 이전 버전은 "fallback 79건 중 2건이 첨부 XML 2개 이상 실패로 중복 계상"이라고 서술했으나 **틀림**(원본 `document_ir/periodic.jsonl` 전수 재대조 결과, fallback 79건은 문서당 `parse_failed` 정확히 1개씩, 합 79). 실제 구성은 **79(fallback, `ET.fromstring` 파싱 실패) + 2(별도 집합, tier는 `partial` 그대로 유지)** = 81. 이 2건은 `doc.file_format=="pdf+html"` 문서의 `{rcept_no}_viewer.html`에 `<table>` 태그가 0개라 `parse_kind_html_text()`가 경고만 남기고(`parsed_ok` 플래그를 안 건드림) tier를 fallback으로 안 내림 — `n_nodes=0`, `text_preservation_ratio=0.0`(완전 손실). doc_id 및 상세는 `data/artifacts/handoff/parse_failure_cases.jsonl` 참고
 - 상세 근거: `data/artifacts/parse_summary.json`(doc_group/warning code별 분포 전체), `data/artifacts/parse_audit.jsonl`(문서별)
 - `failed_documents.jsonl`은 0바이트 — 파싱 자체가 예외로 죽은 문서는 없음
 - Parser Gold 후보 90건 생성 완료(`data/artifacts/parser_gold_candidates.jsonl` + 검수 template `data/artifacts/parser_gold_annotation_template.csv`) — **아직 사람 검수 전, gold 정답 아님**
