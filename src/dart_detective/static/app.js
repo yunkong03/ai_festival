@@ -374,9 +374,11 @@ function explainNumber() {
     return;
   }
   // 이 답변은 Case Pack 데이터라 LLM 없이도 항상 동작한다.
+  const doc = S.briefing.documents.find((d) => d.document_id === e.document_id);
+  const where = doc ? `${doc.document_id} ${doc.title}` : (e.document_id || "수집한 공시");
   botSay(`<div class="answer"><strong>${esc(e.text)}</strong></div>
           <div class="answer mt-s">${esc(e.educational_reason)}</div>
-          <div class="cites">출처 ${esc(e.document_id)} · 공시 원문에서 수집한 단서</div>`);
+          <div class="cites">출처 ${esc(where)}</div>`);
 }
 
 async function askFree(question) {

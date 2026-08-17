@@ -276,6 +276,15 @@ def main() -> int:
           shot(page, "reset")
 
           assert not errors, f"브라우저 콘솔 에러: {errors[:3]}"
+
+          # 화면에 'undefined'/'null'/'NaN'이 찍히면 데이터 계약이 깨진 것이다
+          for screen in ("#screen-desk", "#screen-doc", "#screen-decision",
+                         "#screen-replay", "#screen-complete",
+                         "#drawerNotebook", "#drawerBoard", "#drawerAssistant"):
+              body = page.locator(screen).inner_text()
+              for bad in ("undefined", "NaN", "[object Object]"):
+                  assert bad not in body, f"{screen}에 '{bad}'가 렌더됨"
+
           browser.close()
 
     finally:

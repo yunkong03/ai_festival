@@ -164,9 +164,10 @@ def open_document_node(state: GameState, config: RunnableConfig) -> dict[str, An
         "document_date": doc["document_date"],
         "original_text": doc["original_text"],
         "evidence_options": [
-            {"evidence_id": e["evidence_id"], "text": e["text"],
-             "source_text": e["source_text"], "category": e["category"],
-             "importance": e["importance"], "educational_reason": e["educational_reason"],
+            {"evidence_id": e["evidence_id"], "document_id": e["document_id"],
+             "text": e["text"], "source_text": e["source_text"],
+             "category": e["category"], "importance": e["importance"],
+             "educational_reason": e["educational_reason"],
              "collected": e["evidence_id"] in found}
             for e in rt.pack.evidence if e["document_id"] == document_id
         ],

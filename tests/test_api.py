@@ -107,6 +107,8 @@ def test_evidence_options_carry_source_text_for_highlighting(client):
     assert doc["evidence_options"]
     for opt in doc["evidence_options"]:
         assert opt["source_text"] in doc["original_text"]
+        # 프론트가 "출처 D01 …"을 그리려면 document_id가 있어야 한다(없으면 undefined가 찍힌다)
+        assert opt["document_id"] == "D01"
 
 
 def test_points_can_be_disabled_for_demo(client):
