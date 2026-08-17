@@ -19,20 +19,30 @@ Streamlit으로 옮기면 그걸 전부 버려야 한다.
 > HF에서 **Docker Space는 PRO 구독($9/월)이 필요**하다. 무료는 Static Space뿐이고,
 > 그건 파이썬 백엔드를 못 돌린다. 아래 표를 그에 맞게 고쳤다.
 
-## 1. 옵션 비교 (2026-08 기준)
+## 1. 옵션 비교 (2026-08, 각 제공사 공식 페이지 확인)
 
 | 방법 | 비용 | 카드 | 공개 URL | 언제 |
 |---|---|---|---|---|
-| **Cloudflare Tunnel / ngrok** | 무료 | 불필요 | ✅ 임시 | **발표 당일 라이브 시연.** 가장 확실하고 즉시 된다 |
-| **Koyeb 무료** | 무료(웹서비스 1개, 512MB) | 불필요 | ✅ 상시 | **상시 링크가 필요할 때 1순위** |
-| **Render 무료** | 무료 | 불필요 | ✅ 상시 | 대안. 유휴 시 절전 → 첫 접속 콜드스타트 |
+| **Render 무료** | 무료(750시간/월) | 불필요 | ✅ 상시 | **상시 링크 1순위.** Dockerfile 그대로 빌드 |
+| **Cloudflare Tunnel / ngrok** | 무료 | 불필요 | ✅ 임시 | **발표 당일 라이브.** 즉시 되고 콜드스타트 없음 |
 | Hugging Face Spaces (Docker) | **PRO $9/월** | 필요 | ✅ 상시 | HF에 꼭 올려야 할 때만 |
-| Google Cloud Run | 종량제(소규모 무료) | **필요** | ✅ 상시 | 카드 등록이 괜찮다면 안정적 |
-| Fly.io | 유료화됨 | 필요 | ✅ | 더 이상 무료 티어 없음 |
+| Google Cloud Run | 종량제(소규모 무료) | **필요** | ✅ 상시 | 카드 등록이 괜찮다면 |
+| ~~Koyeb 무료~~ | **없어짐** | — | — | 가격 페이지 기준 Pro $29/월부터. "무료 512MB"는 옛 정보 |
+| ~~Fly.io 무료~~ | **없어짐** | — | — | 신규 사용자 무료 티어 폐지 |
 | GitHub Pages / Netlify / HF Static Space | 무료 | 불필요 | ✅ | ❌ **불가.** 정적 호스팅이라 Python 백엔드가 안 돈다 |
 
-> 프론트가 정적 파일이라 "Pages에 올리면 되지 않나" 싶지만, 게임 상태·검색·Agent가 전부
-> 백엔드에 있다. 백엔드 없이는 사건 목록조차 못 불러온다.
+> 무료 티어는 자주 바뀐다. 이 문서에서만 두 번 틀렸다 — HF(무료인 줄 알았으나 Docker는 PRO),
+> Koyeb(무료 컴퓨트가 이미 폐지). 블로그 글 말고 **제공사 가격 페이지를 직접** 볼 것.
+
+### Render 무료 플랜 실제 조건
+
+- 750 인스턴스 시간/월 (한 서비스를 상시로 켜두기 충분)
+- **15분 유휴 시 절전.** 다음 접속에서 기상까지 **약 1분**(로딩 화면이 뜬다)
+- 영구 디스크 없음 — 우리 앱은 디스크에 쓰지 않으니 무관
+- 카드 없이 사용 가능
+
+> 심사위원이 링크를 누르는 시점에 잠들어 있으면 1분을 기다린다. **발표 직전에 한 번
+> 열어서 깨워두거나**, 라이브 시연은 Cloudflare Tunnel로 하는 편이 안전하다.
 
 ### 메모리 실측 — 512MB 무료 티어에 들어간다
 
@@ -44,6 +54,68 @@ python 프로세스 RSS: 88.4MB
 ```
 
 여유가 크다. `DART_DETECTIVE_MAX_SESSIONS`(기본 50)로 상한이 걸려 있어 무한히 늘지도 않는다.
+
+## 2. Render 무료로 배포 (권장)
+
+저장소에 `render.yaml`(Blueprint)이 들어 있어서 클릭 몇 번이면 끝난다.
+
+### 2-1. 코드가 GitHub에 있어야 한다
+
+Render는 GitHub 저장소에서 Dockerfile을 빌드한다. 필요한 것은 전부
+`github.com/yunkong03/ai_festival` main에 올라가 있다(Dockerfile, render.yaml,
+`src/dart_detective/`, `data/artifacts/case_packs/*.json`).
+
+### 2-2. Blueprint로 서비스 만들기
+
+1. https://dashboard.render.com 가입 (GitHub 계정으로 로그인하면 저장소 연결이 같이 된다)
+2. **New → Blueprint**
+3. `ai_festival` 저장소 선택 → Render가 `render.yaml`을 읽는다
+4. **Apply** → 빌드 시작
+
+`render.yaml`이 지정하는 것:
+
+| 항목 | 값 |
+|---|---|
+| runtime | `docker` (루트 `Dockerfile` 사용) |
+| plan | `free` |
+| region | `singapore` (한국에서 가장 가까움) |
+| healthCheckPath | `/health` |
+| env | `DART_DETECTIVE_LLM=off`, 세션 상한 30, TTL 1800초 |
+
+빌드 로그는 서비스 페이지의 **Logs** 탭에 실시간으로 뜬다. 끝나면
+`https://dart-detective-<해시>.onrender.com` 주소가 나온다.
+
+### 2-3. 배포본 검증
+
+빌드가 끝나면 **배포된 주소에 대고 브라우저 E2E를 그대로 돌린다.** 14화면이 전부
+통과하면 진짜로 동작하는 것이다.
+
+```bash
+PYTHONIOENCODING=utf-8 python scripts/run_web_demo_e2e.py   --base-url https://<서비스주소>.onrender.com
+```
+
+> 첫 실행은 절전에서 깨우느라 느릴 수 있다. 한 번 브라우저로 열어 깨운 뒤 돌리면 빠르다.
+
+### 2-4. (선택) LLM 켜기
+
+Render 대시보드 → 서비스 → **Environment**:
+
+| Key | Value |
+|---|---|
+| `DART_DETECTIVE_LLM` | `on` |
+| `ANTHROPIC_API_KEY` | `sk-ant-...` (Secret) |
+
+**공개 URL에 키를 붙이면 아무나 내 계정으로 호출한다.** 레이트 리밋이 없으므로
+심사용 상시 공개라면 끄고 두는 편을 권한다.
+
+### 2-5. 자주 걸리는 것
+
+| 증상 | 원인 / 조치 |
+|---|---|
+| Blueprint에 저장소가 안 보임 | Render의 GitHub 앱에 해당 저장소 접근 권한을 줘야 한다(Configure account) |
+| 빌드는 성공, 헬스체크 실패 | 앱이 `$PORT`를 읽어야 한다. Dockerfile CMD가 이미 그렇게 되어 있으니 수정하지 말 것 |
+| 첫 접속이 1분 걸림 | 무료 플랜 절전. 정상이다 |
+| 진행이 초기화됨 | 세션이 서버 메모리. 재기동하면 리셋(상단 `↺ 처음부터`) |
 
 ## 2. Hugging Face Spaces — **PRO 구독 필요**
 

@@ -188,19 +188,23 @@ PYTHONIOENCODING=utf-8 python scripts/run_web_demo_e2e.py     # 13개 화면 캡
 
 ### 배포 (남에게 링크 공유)
 
-```bash
-# Hugging Face Spaces(Docker) — 무료, 공개 URL, 카드 불필요
-pip install "huggingface_hub[cli]"
-hf auth login                                                        # Write 토큰 붙여넣기
-PYTHONIOENCODING=utf-8 python scripts/push_hf_space.py --repo-id <아이디>/dart-detective
-# -> 조립 + 스모크 검사 + Space 생성 + 업로드까지 한 번에
+**Render 무료** — 저장소에 `render.yaml`(Blueprint)이 있어서 클릭 몇 번이면 끝난다.
 
-# 발표 당일 라이브 시연만 필요하면 터널이 제일 빠르다
+1. https://dashboard.render.com → **New → Blueprint** → 이 저장소 선택 → **Apply**
+2. 빌드 로그는 서비스의 **Logs** 탭. 끝나면 `https://<서비스>.onrender.com`
+3. 배포본 검증: `python scripts/run_web_demo_e2e.py --base-url https://<서비스>.onrender.com`
+
+무료 플랜은 15분 유휴 시 절전 → 첫 접속에 약 1분. 발표 직전에 한 번 열어 깨워두면 된다.
+
+**발표 당일 라이브 시연**은 터널이 더 확실하다(콜드스타트 없음).
+
+```bash
 uvicorn dart_detective.api:app --port 8000
 cloudflared tunnel --url http://localhost:8000
 ```
 
 Streamlit은 쓰지 않는다 — 이미 만든 SPA를 버려야 하고, 지금 앱은 그냥 FastAPI 컨테이너 하나다.
+Hugging Face Spaces는 Docker Space가 **PRO 구독($9/월)** 대상이라 무료로는 못 쓴다.
 공개 배포용으로 세션 상한(`max_sessions` / TTL)과 단일 워커 고정을 넣어 두었다.
 옵션 비교·주의사항: `docs/deploy.md`
 
