@@ -1,0 +1,38 @@
+{
+  "schema_version": "case_pack_v0",
+  "cases": [
+    {
+      "case_id": "CASE-001",
+      "file": "CASE-001.json",
+      "company": "에코프로비엠",
+      "case_title": "4,732억원 증설 결정 — 2차전지 양극재 CAM9",
+      "simulation_date": "2023-05-23",
+      "difficulty": "normal",
+      "n_available_documents": 5,
+      "n_evidence": 15,
+      "n_future_events": 4
+    },
+    {
+      "case_id": "CASE-002",
+      "file": "CASE-002.json",
+      "company": "LS ELECTRIC",
+      "case_title": "803억원 증설 결정 — 초고압 변압기 자작 Capa",
+      "simulation_date": "2024-05-21",
+      "difficulty": "easy",
+      "n_available_documents": 5,
+      "n_evidence": 13,
+      "n_future_events": 3
+    },
+    {
+      "case_id": "CASE-003",
+      "file": "CASE-003.json",
+      "company": "삼성바이오로직스",
+      "case_title": "1조 9,801억원 공장 신설 — 송도 제2바이오캠퍼스 5공장",
+      "simulation_date": "2023-03-17",
+      "difficulty": "hard",
+      "n_available_documents": 4,
+      "n_evidence": 9,
+      "n_future_events": 3
+    }
+  ]
+}

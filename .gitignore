@@ -49,3 +49,17 @@ experiments/
 !data/artifacts/parser_gold_annotation_template.csv
 !data/artifacts/handoff/
 !data/artifacts/handoff/**
+
+# --- 데모 Case Pack: 완성 팩(작음)은 커밋, 중간 캐시(50MB)는 제외 ---
+!data/artifacts/case_packs/
+!data/artifacts/case_packs/CASE-*.json
+!data/artifacts/case_packs/index.json
+data/artifacts/case_packs/_source_docs.jsonl
+# 검색 인덱스는 Case Pack에서 언제든 재생성된다(scripts/build_case_search_index.py)
+data/artifacts/case_packs/search_index.jsonl
+
+# Agent 실행 산출물(trace 등)
+work/agent-runs/
+
+# 배포용으로 조립한 디렉터리(scripts/prepare_hf_space.py가 매번 다시 만든다)
+dist/

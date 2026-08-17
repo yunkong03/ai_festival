@@ -1,0 +1,30 @@
+# 이미지에 들어갈 필요 없는 것들 — 빌드 컨텍스트를 작게 유지한다.
+.git/
+.venv/
+.pytest_cache/
+__pycache__/
+**/__pycache__/
+*.pyc
+
+# 대용량 원본/중간 산출물
+data/3.공시/
+data/artifacts/document_ir/
+data/artifacts/case_packs/_source_docs.jsonl
+data/artifacts/case_packs/search_index.jsonl
+data/artifacts/parse_audit.jsonl
+data/artifacts/handoff/
+data/parse_quality/
+work/
+experiments/
+evaluation-harness-worker-pack/
+*.zip
+*.pdf
+*.xlsx
+
+# 배포에 불필요한 개발 자산
+tests/
+docs/screenshots/
+TODO_A/
+check/
+compare_check/
+domain/
