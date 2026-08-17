@@ -1,0 +1,48 @@
+# 배포된 데모가 잠들지 않게 GitHub Actions가 대신 깨워준다.
+#
+# Render 무료 플랜은 15분간 인바운드 트래픽이 없으면 절전하고, 다음 접속에서
+# 기상까지 약 1분이 걸린다. 이 워크플로가 10분마다 /health를 호출해 깨워둔다.
+#
+# 내 노트북과 무관하게 GitHub 서버에서 돌기 때문에, 노트북을 꺼도/남에게 맡겨도 된다.
+#
+# 켜기:   저장소에 이 파일을 push하면 자동으로 활성화된다.
+#         Actions 탭 → Keep demo warm → Run workflow 로 즉시 한 번 돌려볼 수도 있다.
+# 끄기:   Actions 탭 → Keep demo warm → 우측 "..." → Disable workflow
+#         (행사 끝나면 꺼라 — 무료 750시간/월을 아낀다)
+#
+# 주의: GitHub의 예약 실행은 서버가 붐비면 몇 분 밀릴 수 있다. 정시성이 중요하면
+#       cron-job.org(무료, 가입 필요)를 쓰는 편이 더 정확하다. docs/deploy.md 참고.
+
+name: Keep demo warm
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # 10분마다 (절전 기준 15분보다 짧게)
+  workflow_dispatch:          # 버튼으로 수동 실행
+
+permissions: {}
+
+concurrency:
+  group: keep-warm
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: /health 호출 (잠들어 있으면 기상까지 최대 2분 대기)
+        run: |
+          URL="https://dart-detective.onrender.com/health"
+          for i in 1 2 3; do
+            code=$(curl -sS -o /tmp/body.json -w '%{http_code}' --max-time 120 "$URL" || echo 000)
+            if [ "$code" = "200" ]; then
+              echo "OK ($code)"
+              cat /tmp/body.json
+              exit 0
+            fi
+            echo "attempt $i: HTTP $code — 재시도"
+            sleep 20
+          done
+          echo "깨우기 실패 — Render 대시보드 Logs를 확인하라"
+          exit 1

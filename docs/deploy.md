@@ -244,22 +244,35 @@ Space를 먼저 웹에서 만들어야 하고(SDK: **Docker**), 토큰을 비밀
 **남이 링크를 배포하는 구조면 Render만 쓴다.** 맡은 분은 아무것도 안 해도 된다.
 터널은 내가 내 노트북 앞에서 직접 시연할 때만 의미가 있다.
 
-### 잠들지 않게 하는 법 (택 1)
+### 잠들지 않게 하는 법 — **내가 오늘 한 번 설정한다. 맡은 분은 아무것도 안 한다**
 
-**A. 외부 무료 모니터링 — 노트북과 무관해서 이 상황에 맞다**
+깨우는 일은 노트북과 무관한 곳에서 돌아야 한다. 맡은 분에게 터미널 명령을 시키는 건
+가장 나쁜 선택이다(저장소 clone + 파이썬 설치 + 노트북 상시 켜두기가 전부 필요해진다).
 
-1. https://cron-job.org (무료, 카드 불필요) 또는 UptimeRobot 가입
-2. 새 job: URL `https://dart-detective.onrender.com/health`, 실행 주기 **10분**
-3. 행사 끝나면 job을 끈다(750시간 한도 아끼려면)
+**A. GitHub Actions — 가입 불필요, 이미 있는 저장소에서 돈다 (권장)**
 
-**B. 아무 컴퓨터에서나 핑 스크립트** — 그 컴퓨터가 켜져 있어야 한다
+`.github/workflows/keep-warm.yml`이 저장소에 들어 있다. push하면 자동 활성화되고,
+GitHub 서버가 10분마다 `/health`를 호출한다. 내 노트북은 꺼도 된다.
+
+- 즉시 한 번 돌려보기: 저장소 **Actions** 탭 → *Keep demo warm* → **Run workflow**
+- 행사 끝나면: 같은 화면 우측 `...` → **Disable workflow**
+- 한계: GitHub 예약 실행은 서버가 붐비면 몇 분 밀릴 수 있다(정시 보장 아님)
+
+**B. cron-job.org — 가입 필요하지만 정시성이 더 정확하다**
+
+1. https://cron-job.org (무료, 카드 불필요)
+2. URL `https://dart-detective.onrender.com/health`, 주기 **10분**
+3. 행사 끝나면 job 비활성화
+
+**C. 아무것도 안 하기** — 행사 직전에 브라우저로 한 번 열어 깨우면, 그 뒤로 관람객이
+계속 들어오는 한 안 잔다. 관람이 뜸한 시간대에만 첫 접속자가 1분을 기다린다.
+
+**D. `scripts/keep_warm.py`** — 내가 내 컴퓨터를 켜둘 수 있을 때만. 그 컴퓨터가 꺼지면
+같이 멈춘다. **남에게 맡길 노트북에서 돌리면 안 된다.**
 
 ```bash
 PYTHONIOENCODING=utf-8 python scripts/keep_warm.py   --url https://dart-detective.onrender.com --interval 600 --hours 8
 ```
-
-**C. 아무것도 안 하기** — 행사 직전에 브라우저로 한 번 열어 깨우기만 해도,
-그 뒤로 사람들이 계속 들어오면 안 잔다. 관람이 뜸할 때만 위험하다.
 
 ### 동시 접속은 견디나 — 배포본 실측
 
@@ -280,12 +293,25 @@ active_sessions=12/100
 
 ### 맡기기 전 체크리스트
 
-- [ ] 링크를 브라우저로 열어 한 번 깨워둔다
-- [ ] cron-job.org 핑을 10분 간격으로 걸어둔다(A안)
-- [ ] 한 판 직접 끝까지 해본다(Reality Replay까지)
-- [ ] 맡은 분에게: **"링크만 보내주시면 됩니다. 노트북은 꺼도 됩니다"**
-- [ ] 혹시 화면이 이상하면 상단 `↺ 처음부터`를 누르면 된다고 알려둔다
-- [ ] LLM은 꺼져 있다(공개 URL이라 의도적). 굳이 켜지 말 것
+**내가 오늘 할 것**
+
+- [ ] `.github/workflows/keep-warm.yml`을 push하고 Actions 탭에서 **Run workflow**로 한 번 확인
+- [ ] 링크를 브라우저로 열어 한 판 끝까지 해본다(Reality Replay까지)
+- [ ] LLM은 꺼진 상태 그대로 둔다(공개 URL이라 의도적)
+
+**맡은 분께 전달할 것 — 이게 전부다**
+
+```
+https://dart-detective.onrender.com
+
+이 링크만 보내주시면 됩니다.
+설치할 것도, 실행할 것도 없습니다. 노트북은 꺼두셔도 됩니다.
+화면이 이상하면 오른쪽 위 "↺ 처음부터"를 누르면 됩니다.
+```
+
+**행사 후**
+
+- [ ] Actions 탭에서 *Keep demo warm* **Disable**(무료 750시간/월 아끼기)
 
 ## 3. Docker 직접 (Render / Fly.io / Cloud Run / 사내 서버)
 
