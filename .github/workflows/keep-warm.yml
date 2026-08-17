@@ -2,16 +2,23 @@
 #
 # Render 무료 플랜은 15분간 인바운드 트래픽이 없으면 절전하고, 다음 접속에서
 # 기상까지 약 1분이 걸린다. 이 워크플로가 10분마다 /health를 호출해 깨워둔다.
+# GitHub 서버에서 돌기 때문에 내 노트북은 꺼도 된다.
 #
-# 내 노트북과 무관하게 GitHub 서버에서 돌기 때문에, 노트북을 꺼도/남에게 맡겨도 된다.
+# ─────────────────────────────────────────────────────────────────────────────
+# 끄는 방법 (셋 중 아무거나)
 #
-# 켜기:   저장소에 이 파일을 push하면 자동으로 활성화된다.
-#         Actions 탭 → Keep demo warm → Run workflow 로 즉시 한 번 돌려볼 수도 있다.
-# 끄기:   Actions 탭 → Keep demo warm → 우측 "..." → Disable workflow
-#         (행사 끝나면 꺼라 — 무료 750시간/월을 아낀다)
+#   1) 자동 — 아무것도 안 해도 KEEP_WARM_UNTIL 날짜(한국시간 기준)가 지나면
+#      핑을 멈춘다. 아래 env에서 날짜만 고치면 된다.
 #
+#   2) 수동/즉시 — 저장소 Actions 탭 → 왼쪽 "Keep demo warm" → 우측 "..." →
+#      Disable workflow. 워크플로 실행 자체가 멈춘다. 다시 켜려면 Enable.
+#
+#   3) 영구 — 이 파일을 삭제하고 push.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# 비용: 이 저장소는 public이라 GitHub Actions 사용량이 무료(분 제한 없음)다.
 # 주의: GitHub의 예약 실행은 서버가 붐비면 몇 분 밀릴 수 있다. 정시성이 중요하면
-#       cron-job.org(무료, 가입 필요)를 쓰는 편이 더 정확하다. docs/deploy.md 참고.
+#       cron-job.org(무료, 가입 필요)가 더 정확하다. docs/deploy.md 참고.
 
 name: Keep demo warm
 
@@ -32,16 +39,34 @@ concurrency:
   group: keep-warm
   cancel-in-progress: false
 
+env:
+  DEMO_URL: "https://dart-detective.onrender.com"
+  # 이 날짜(한국시간, 이 날 포함)까지만 깨운다. 지나면 자동으로 핑을 건너뛴다.
+  KEEP_WARM_UNTIL: "2026-08-18"
+
 jobs:
   ping:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: /health 호출 (잠들어 있으면 기상까지 최대 2분 대기)
+      - name: 기한 확인 (한국시간)
+        id: gate
         run: |
-          URL="https://dart-detective.onrender.com/health"
+          today=$(TZ=Asia/Seoul date +%F)
+          echo "오늘(KST): $today · 유지 기한: $KEEP_WARM_UNTIL"
+          if [[ "$today" > "$KEEP_WARM_UNTIL" ]]; then
+            echo "기한이 지났다 — 핑을 건너뛴다."
+            echo "너무 자주 도는 게 거슬리면 Actions 탭에서 이 워크플로를 Disable하면 된다."
+            echo "expired=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "expired=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: /health 호출 (잠들어 있으면 기상까지 최대 2분 대기)
+        if: steps.gate.outputs.expired != 'true'
+        run: |
           for i in 1 2 3; do
-            code=$(curl -sS -o /tmp/body.json -w '%{http_code}' --max-time 120 "$URL" || echo 000)
+            code=$(curl -sS -o /tmp/body.json -w '%{http_code}' --max-time 120 "$DEMO_URL/health" || echo 000)
             if [ "$code" = "200" ]; then
               echo "OK ($code)"
               cat /tmp/body.json
