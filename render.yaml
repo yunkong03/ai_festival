@@ -25,7 +25,9 @@ services:
       # DART_DETECTIVE_LLM=on + ANTHROPIC_API_KEY(secret)를 추가한다.
       - key: DART_DETECTIVE_LLM
         value: "off"
+      # Retriever를 case별로 공유하므로 세션이 늘어도 메모리가 거의 늘지 않는다
+      # (실측: 25세션 85.6MB). 여러 명이 동시에 들어와도 중간에 밀려나지 않도록 넉넉히.
       - key: DART_DETECTIVE_MAX_SESSIONS
-        value: "30"
+        value: "100"
       - key: DART_DETECTIVE_SESSION_TTL
         value: "1800"

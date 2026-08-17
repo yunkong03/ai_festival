@@ -58,11 +58,25 @@ def drop_runtime(session_id: str) -> None:
     _RUNTIMES.pop(session_id, None)
 
 
+# Retriever는 읽기 전용(chunk + BM25 통계)이라 세션끼리 공유해도 안전하다.
+# case별로 한 번만 만든다 — 세션마다 인덱스 파일을 다시 읽고 BM25를 다시 세우면
+# 동시 접속이 늘 때 메모리와 세션 생성 지연이 그대로 배로 늘어난다.
+_RETRIEVERS: dict[tuple[str, str, str], PointInTimeRetriever] = {}
+
+
+def get_retriever(index_path: Any, case_id: str, simulation_date: str
+                  ) -> PointInTimeRetriever:
+    key = (str(index_path), case_id, simulation_date)
+    if key not in _RETRIEVERS:
+        _RETRIEVERS[key] = PointInTimeRetriever.from_index_file(
+            index_path, case_id=case_id, simulation_date=simulation_date
+        )
+    return _RETRIEVERS[key]
+
+
 def make_runtime(session_id: str, pack: CasePack, index_path: Any,
                  use_llm: bool = True) -> SessionRuntime:
-    retriever = PointInTimeRetriever.from_index_file(
-        index_path, case_id=pack.case_id, simulation_date=pack.simulation_date
-    )
+    retriever = get_retriever(index_path, pack.case_id, pack.simulation_date)
     runtime = SessionRuntime(
         session_id=session_id,
         pack=pack,
